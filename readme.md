@@ -7,5 +7,12 @@ bash commands realted:
 
 Git related:
 1. Git init
-2. Git add .
+2. Git add . (all files)
 3. Git commit -m ""
+4. Git remote add origin URL  
+   - here origin is the default name given to a remote repo
+5. Git push -u origin main
+    - here -u is upstream , local tracking the remote origin/main 
+
+Git concept:
+    - main is like pointer points the repofolder
