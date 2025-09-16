@@ -1,0 +1,43 @@
+# Common deps (covers future additions)
+node_modules/
+
+# Backend
+backend/node_modules/
+backend/logs/
+backend/*.log
+backend/npm-debug.log*
+backend/yarn-debug.log*
+backend/yarn-error.log*
+backend/pnpm-debug.log*
+backend/coverage/
+backend/.nyc_output/
+backend/.env
+backend/.env.*
+
+# Frontend (static now, but future-ready)
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.cache/
+frontend/.parcel-cache/
+frontend/.env
+frontend/.env.*
+
+# General logs
+logs/
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Editors / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Misc caches/temp
+.eslintcache
+.tmp/
+tmp/

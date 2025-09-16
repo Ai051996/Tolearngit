@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Contact Saver</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; }
+      form { display: grid; gap: 0.75rem; max-width: 420px; }
+      label { display: grid; gap: 0.25rem; font-weight: 600; }
+      input { padding: 0.5rem 0.6rem; border: 1px solid #ccc; border-radius: 6px; }
+      button { padding: 0.6rem 0.9rem; border: 0; border-radius: 6px; background: #2563eb; color: #fff; cursor: pointer; }
+      button:disabled { background: #9ca3af; cursor: not-allowed; }
+      .row { display: flex; gap: 0.5rem; }
+      .error { color: #b91c1c; }
+      table { margin-top: 2rem; border-collapse: collapse; width: 100%; max-width: 640px; }
+      th, td { border: 1px solid #e5e7eb; padding: 0.5rem; }
+      th { background: #f3f4f6; text-align: left; }
+    </style>
+  </head>
+  <body>
+    <h1>Contact Saver</h1>
+    <form id="contact-form">
+      <label>
+        Name
+        <input id="name" name="name" required />
+      </label>
+      <label>
+        Email
+        <input id="email" name="email" type="email" required />
+      </label>
+      <label>
+        Phone
+        <input id="phone" name="phone" />
+      </label>
+      <div class="row">
+        <button id="save" type="submit">Save</button>
+        <span id="msg" class="error" aria-live="polite"></span>
+      </div>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="contacts"></tbody>
+    </table>
+
+    <script>
+      const form = document.getElementById('contact-form');
+      const msg = document.getElementById('msg');
+      const contactsTbody = document.getElementById('contacts');
+
+      async function fetchContacts() {
+        const res = await fetch('/api/contacts');
+        const data = await res.json();
+        renderContacts(data);
+      }
+
+      function renderContacts(list) {
+        contactsTbody.innerHTML = '';
+        for (const c of list) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${c.name}</td>
+            <td>${c.email}</td>
+            <td>${c.phone || ''}</td>
+            <td><button data-id="${c.id}">Delete</button></td>
+          `;
+          tr.querySelector('button').addEventListener('click', async (e) => {
+            const id = e.target.getAttribute('data-id');
+            await fetch(`/api/contacts/${id}`, { method: 'DELETE' });
+            fetchContacts();
+          });
+          contactsTbody.appendChild(tr);
+        }
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        msg.textContent = '';
+        const formData = new FormData(form);
+        const payload = Object.fromEntries(formData.entries());
+        try {
+          const res = await fetch('/api/contacts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) {
+            const err = await res.json();
+            msg.textContent = err.error || 'Failed to save';
+            return;
+          }
+          form.reset();
+          fetchContacts();
+        } catch (err) {
+          msg.textContent = 'Network error';
+        }
+      });
+
+      fetchContacts();
+    </script>
+  </body>
+  </html>
+
+
